@@ -10,11 +10,12 @@ const signin = async (req, res) => {
     if (!user.authenticate(req.body.password)) {
       return res.status(401).json({ error: "Email and password don't match." })
     }
-    const token = jwt.sign({ _id: user._id }, config.jwtSecret, { expiresIn: '1d' })
+    // add the role to the token
+    const token = jwt.sign({ _id: user._id, role: user.role }, config.jwtSecret, { expiresIn: '1d' })
     res.cookie('t', token, { expires: new Date(Date.now() + 24 * 60 * 60 * 1000) })
     return res.status(200).json({
       token,
-      user: { _id: user._id, name: user.name, email: user.email }
+      user: { _id: user._id, name: user.name, email: user.email, role: user.role }
     })
   } catch (err) {
     return res.status(401).json({ error: 'Could not sign in' })
@@ -40,4 +41,12 @@ const hasAuthorization = (req, res, next) => {
   next()
 }
 
-export default { signin, signout, requireSignin, hasAuthorization }
+// only admin can add, edit and delete
+const isAdmin = (req, res, next) => {
+  if (!req.auth || req.auth.role !== 'admin') {
+    return res.status(403).json({ error: 'Admin access only' })
+  }
+  next()
+}
+
+export default { signin, signout, requireSignin, hasAuthorization, isAdmin }

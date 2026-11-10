@@ -4,8 +4,9 @@ import authCtrl from '../controllers/auth.controller.js'
 
 const router = express.Router()
 
+// only admin can see all users
 router.route('/api/users')
-  .get(userCtrl.list)
+  .get(authCtrl.requireSignin, authCtrl.isAdmin, userCtrl.list)
   .post(userCtrl.create)
 
 router.route('/api/users/:userId')

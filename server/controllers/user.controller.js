@@ -2,8 +2,13 @@ import User from '../models/user.model.js'
 import extend from 'lodash/extend.js'
 import errorHandler from '../helpers/dbErrorHandler.js'
 
+// sign up - new user is always normal user
 const create = async (req, res) => {
-  const user = new User(req.body)
+  const user = new User({
+    name: req.body.name,
+    email: req.body.email,
+    password: req.body.password
+  })
   try {
     await user.save()
     return res.status(201).json({ message: 'Successfully signed up!' })
@@ -14,7 +19,7 @@ const create = async (req, res) => {
 
 const list = async (req, res) => {
   try {
-    const users = await User.find().select('name email updated created')
+    const users = await User.find().select('name email role updated created')
     res.status(200).json(users)
   } catch (err) {
     return res.status(500).json({ error: errorHandler.getErrorMessage(err) })
@@ -40,6 +45,8 @@ const read = (req, res) => {
 
 const update = async (req, res) => {
   try {
+    // user can not change the role
+    delete req.body.role
     let user = req.profile
     user = extend(user, req.body)
     user.updated = Date.now()
