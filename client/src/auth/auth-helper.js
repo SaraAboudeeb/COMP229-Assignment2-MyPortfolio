@@ -1,3 +1,6 @@
+// link of the server (empty on my computer)
+const API_URL = process.env.REACT_APP_API_URL || '';
+
 // save the token and user after sign in
 const authenticate = (data) => {
   localStorage.setItem('jwt', JSON.stringify(data));
@@ -20,7 +23,7 @@ const isAdmin = () => {
 const signout = async () => {
   localStorage.removeItem('jwt');
   try {
-    await fetch('/auth/signout');
+    await fetch(API_URL + '/auth/signout');
   } catch (err) {
     console.log(err);
   }
