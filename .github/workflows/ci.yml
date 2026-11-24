@@ -23,7 +23,7 @@ jobs:
           node-version: 20
 
       - name: Install packages
-        run: npm ci
+        run: npm install
         env:
           # no need for the cypress app here
           CYPRESS_INSTALL_BINARY: 0
